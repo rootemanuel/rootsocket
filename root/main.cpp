@@ -1,15 +1,75 @@
 //
-//  main.cpp
+//  main
 //  root
 //
-//  Created by Emanuel Root on 23/12/17.
+//  Created by Emanuel Root on 26/12/17.
 //  Copyright © 2017 Emanuel Root. All rights reserved.
 //
 
-#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout << "Hello, World!\n";
-    return 0;
+#define PORT "6000"
+#define BUFFER 1024
+#define CON 1024
+
+void error(const char *msg)
+{
+    perror(msg);
+    exit(1);
+}
+
+int main()
+{
+    
+    socklen_t clilen;
+    char buffer[BUFFER];
+    struct sockaddr_in serv_addr, cli_addr;
+    int sockfd, newsockfd, portno, auxerror;
+    
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0){
+        error("#r00t err - socket");
+    }
+    
+    bzero((char *) &serv_addr, sizeof(serv_addr));
+    portno = atoi(PORT);
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = INADDR_ANY;
+    serv_addr.sin_port = htons(portno);
+    
+    if (bind(sockfd, (struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0){
+        error("#r00t err - binding");
+    }
+    
+    while (true) {
+        
+        listen(sockfd,5);
+        clilen = sizeof(cli_addr);
+        newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr, &clilen);
+        if (newsockfd < 0){
+            error("#r00t err - accept");
+        }
+        
+        bzero(buffer,BUFFER);
+        auxerror = read(newsockfd,buffer,BUFFER);
+        
+        if (auxerror < 0) {
+            error("#r00t err - reading socket");
+        }
+        
+        printf("#r00t msg - %s",buffer);
+        auxerror = write(newsockfd,"#r00t - receiv msg",18);
+        
+        if (auxerror < 0){
+            error("#r00t err - writing to socket");
+        }
+    }
+    
+    return EXIT_SUCCESS;
 }
