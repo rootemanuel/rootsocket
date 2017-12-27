@@ -16,7 +16,7 @@
 
 #define PORT "6000"
 #define BUFFER 1024
-#define CON 1024
+#define CONMAX 5
 
 void error(const char *msg)
 {
@@ -49,7 +49,7 @@ int main()
     
     while (true) {
         
-        listen(sockfd,5);
+        listen(sockfd,CONMAX);
         clilen = sizeof(cli_addr);
         newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr, &clilen);
         if (newsockfd < 0){
