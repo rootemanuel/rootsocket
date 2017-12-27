@@ -18,14 +18,12 @@
 #define BUFFER 1024
 #define CONMAX 5
 
-void error(const char *msg)
-{
+int error(const char *msg) {
     perror(msg);
-    exit(1);
+    return EXIT_FAILURE;
 }
 
-int main()
-{
+int main() {
     
     socklen_t clilen;
     char buffer[BUFFER];
